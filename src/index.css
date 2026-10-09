@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+
+@theme {
+  --font-vazir: "Vazirmatn Variable", sans-serif;
+}
+
+html {
+  font-family: "Vazirmatn Variable", sans-serif;
+}

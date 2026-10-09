@@ -1,0 +1,98 @@
+import {
+  X,
+  CoffeeIcon,
+  HomeIcon,
+  LayoutGrid,
+  Star,
+  ShoppingBag,
+  PackageSearch,
+  ShoppingCart,
+  Heart,
+  UserRound,
+  Info,
+  Phone,
+  CircleHelp,
+} from "lucide-react";
+
+const navItems = [
+  {
+    id: 1,
+    title: "صفحه اصلی",
+    path: "/",
+    icon: HomeIcon,
+    desktop: true,
+    desktop: true,
+  },
+  {
+    id: 2,
+    title: "فروشگاه",
+    path: "/shop",
+    icon: CoffeeIcon,
+    desktop: true,
+  },
+  {
+    id: 3,
+    title: "دسته‌بندی",
+    path: "/categories",
+    icon: LayoutGrid,
+    desktop: true,
+  },
+  {
+    id: 4,
+    title: "پیشنهادهای ویژه",
+    path: "/menu?featured=true",
+    icon: Star,
+  },
+  {
+    id: 5,
+    title: "سفارش‌های من",
+    path: "/orders",
+    icon: ShoppingBag,
+    desktop: true,
+  },
+  {
+    id: 6,
+    title: "پیگیری سفارش",
+    path: "/track-order",
+    icon: PackageSearch,
+  },
+  {
+    id: 7,
+    title: "سبد خرید",
+    path: "/cart",
+    icon: ShoppingCart,
+  },
+  {
+    id: 8,
+    title: "علاقه‌مندی‌ها",
+    path: "/favorites",
+    icon: Heart,
+  },
+  {
+    id: 9,
+    title: "پروفایل",
+    path: "/profile",
+    icon: UserRound,
+  },
+  {
+    id: 10,
+    title: "درباره ما",
+    path: "/about",
+    icon: Info,
+    desktop: true,
+  },
+  {
+    id: 11,
+    title: "تماس با ما",
+    path: "/contact",
+    icon: Phone,
+    desktop: true,
+  },
+  {
+    id: 12,
+    title: "سوالات متداول",
+    path: "/faq",
+    icon: CircleHelp,
+  },
+];
+export default navItems;

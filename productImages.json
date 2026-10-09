@@ -1,0 +1,187 @@
+{
+  "espresso": {
+    "name": "اسپرسو",
+    "category": "coffee",
+    "path": "/product-images/coffee/espresso.jpg"
+  },
+  "double-espresso": {
+    "name": "دبل اسپرسو",
+    "category": "coffee",
+    "path": "/product-images/coffee/double-espresso.jpg"
+  },
+  "americano": {
+    "name": "آمریکانو",
+    "category": "coffee",
+    "path": "/product-images/coffee/americano.jpg"
+  },
+  "latte": {
+    "name": "لاته",
+    "category": "coffee",
+    "path": "/product-images/coffee/latte.jpg"
+  },
+  "cappuccino": {
+    "name": "کاپوچینو",
+    "category": "coffee",
+    "path": "/product-images/coffee/cappuccino.jpg"
+  },
+  "mocha": {
+    "name": "موکا",
+    "category": "coffee",
+    "path": "/product-images/coffee/mocha.jpg"
+  },
+  "turkish-coffee": {
+    "name": "قهوه ترک",
+    "category": "coffee",
+    "path": "/product-images/coffee/turkish-coffee.jpg"
+  },
+  "v60-brew": {
+    "name": "قهوه دمی V60",
+    "category": "coffee",
+    "path": "/product-images/coffee/v60-brew.jpg"
+  },
+  "iced-americano": {
+    "name": "آیس آمریکانو",
+    "category": "coffee",
+    "path": "/product-images/coffee/iced-americano.jpg"
+  },
+  "iced-latte": {
+    "name": "آیس لاته",
+    "category": "coffee",
+    "path": "/product-images/coffee/iced-latte.jpg"
+  },
+  "hot-chocolate": {
+    "name": "هات چاکلت",
+    "category": "hot-drinks",
+    "path": "/product-images/hot-drinks/hot-chocolate.jpg"
+  },
+  "masala-chai": {
+    "name": "چای ماسالا",
+    "category": "hot-drinks",
+    "path": "/product-images/hot-drinks/masala-chai.jpg"
+  },
+  "green-tea": {
+    "name": "چای سبز",
+    "category": "hot-drinks",
+    "path": "/product-images/hot-drinks/green-tea.jpg"
+  },
+  "matcha-latte": {
+    "name": "ماچا لاته",
+    "category": "hot-drinks",
+    "path": "/product-images/hot-drinks/matcha-latte.jpg"
+  },
+  "herbal-tea": {
+    "name": "دمنوش گیاهی",
+    "category": "hot-drinks",
+    "path": "/product-images/hot-drinks/herbal-tea.jpg"
+  },
+  "lemonade": {
+    "name": "لیموناد",
+    "category": "cold-drinks",
+    "path": "/product-images/cold-drinks/lemonade.jpg"
+  },
+  "strawberry-smoothie": {
+    "name": "اسموتی توت‌فرنگی",
+    "category": "cold-drinks",
+    "path": "/product-images/cold-drinks/strawberry-smoothie.jpg"
+  },
+  "mango-smoothie": {
+    "name": "اسموتی انبه",
+    "category": "cold-drinks",
+    "path": "/product-images/cold-drinks/mango-smoothie.jpg"
+  },
+  "vanilla-milkshake": {
+    "name": "میلک‌شیک وانیل",
+    "category": "cold-drinks",
+    "path": "/product-images/cold-drinks/vanilla-milkshake.jpg"
+  },
+  "chocolate-milkshake": {
+    "name": "میلک‌شیک شکلات",
+    "category": "cold-drinks",
+    "path": "/product-images/cold-drinks/chocolate-milkshake.jpg"
+  },
+  "iced-matcha": {
+    "name": "آیس ماچا",
+    "category": "cold-drinks",
+    "path": "/product-images/cold-drinks/iced-matcha.jpg"
+  },
+  "cheesecake": {
+    "name": "چیزکیک",
+    "category": "desserts",
+    "path": "/product-images/desserts/cheesecake.jpg"
+  },
+  "chocolate-cake": {
+    "name": "کیک شکلاتی",
+    "category": "desserts",
+    "path": "/product-images/desserts/chocolate-cake.jpg"
+  },
+  "tiramisu": {
+    "name": "تیرامیسو",
+    "category": "desserts",
+    "path": "/product-images/desserts/tiramisu.jpg"
+  },
+  "brownie": {
+    "name": "براونی",
+    "category": "desserts",
+    "path": "/product-images/desserts/brownie.jpg"
+  },
+  "croissant": {
+    "name": "کروسان",
+    "category": "desserts",
+    "path": "/product-images/desserts/croissant.jpg"
+  },
+  "cookie-box": {
+    "name": "باکس کوکی",
+    "category": "desserts",
+    "path": "/product-images/desserts/cookie-box.jpg"
+  },
+  "chocolate-muffin": {
+    "name": "مافین شکلاتی",
+    "category": "desserts",
+    "path": "/product-images/desserts/chocolate-muffin.jpg"
+  },
+  "french-press": {
+    "name": "فرنچ پرس",
+    "category": "equipment",
+    "path": "/product-images/equipment/french-press.jpg"
+  },
+  "moka-pot": {
+    "name": "موکاپات",
+    "category": "equipment",
+    "path": "/product-images/equipment/moka-pot.jpg"
+  },
+  "v60-dripper": {
+    "name": "دریپر V60",
+    "category": "equipment",
+    "path": "/product-images/equipment/v60-dripper.jpg"
+  },
+  "paper-filters": {
+    "name": "فیلتر کاغذی V60",
+    "category": "equipment",
+    "path": "/product-images/equipment/paper-filters.jpg"
+  },
+  "coffee-grinder": {
+    "name": "آسیاب دستی قهوه",
+    "category": "equipment",
+    "path": "/product-images/equipment/coffee-grinder.jpg"
+  },
+  "milk-pitcher": {
+    "name": "پیچر شیر",
+    "category": "equipment",
+    "path": "/product-images/equipment/milk-pitcher.jpg"
+  },
+  "breakfast-combo": {
+    "name": "پکیج صبحانه",
+    "category": "special-offers",
+    "path": "/product-images/special-offers/breakfast-combo.jpg"
+  },
+  "date-night-dessert-set": {
+    "name": "ست دونفره دسر",
+    "category": "special-offers",
+    "path": "/product-images/special-offers/date-night-dessert-set.jpg"
+  },
+  "cold-brew-pack": {
+    "name": "پک قهوه سرد",
+    "category": "special-offers",
+    "path": "/product-images/special-offers/cold-brew-pack.jpg"
+  }
+}
