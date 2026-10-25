@@ -8,7 +8,7 @@ export default function FeatureUnit({ title, Icon, description }) {
       type="button"
       aria-expanded={isExpanded}
       onClick={() => setIsExpanded((expanded) => !expanded)}
-      className="feature-unit group flex min-h-16 w-full items-center justify-center gap-3 rounded-xl px-2 text-right text-[var(--mui-palette-text-primary)] transition-colors hover:bg-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mui-palette-primary-main)] sm:px-4"
+      className="feature-unit group flex min-h-16 w-full items-center justify-center gap-3 rounded-xl px-2 text-right text-[var(--mui-palette-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mui-palette-primary-main)] sm:px-4"
       data-expanded={isExpanded}
     >
       <span className="min-w-0">

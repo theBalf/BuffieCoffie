@@ -1,5 +1,4 @@
 import {
-  X,
   CoffeeIcon,
   HomeIcon,
   LayoutGrid,
@@ -21,7 +20,6 @@ const navItems = [
     path: "/",
     icon: HomeIcon,
     desktop: true,
-    desktop: true,
   },
   {
     id: 2,
@@ -32,8 +30,8 @@ const navItems = [
   },
   {
     id: 3,
-    title: "دسته‌بندی",
-    path: "/categories",
+    title: "منو",
+    path: "/menu",
     icon: LayoutGrid,
     desktop: true,
   },
@@ -71,7 +69,7 @@ const navItems = [
   {
     id: 9,
     title: "پروفایل",
-    path: "/profile",
+    path: "/account",
     icon: UserRound,
   },
   {

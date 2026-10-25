@@ -43,7 +43,6 @@ export default function ProductPagination({
 
           hover:bg-[#EFE5D8]
 
-          disabled:cursor-not-allowed
           disabled:opacity-30
 
           dark:text-[#D7B08A]
@@ -88,7 +87,6 @@ export default function ProductPagination({
 
           hover:bg-[#EFE5D8]
 
-          disabled:cursor-not-allowed
           disabled:opacity-30
 
           dark:text-[#D7B08A]

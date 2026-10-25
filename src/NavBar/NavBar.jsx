@@ -10,6 +10,7 @@ import {
 import logoNavLight from "../Assets/buffiecoffee-logo-light-hq.png";
 import ToggleDarkMode from "../Components/ToggleDarkMode";
 import { useCart } from "@/Context/CartProvider";
+import { useAuth } from "@/Context/AuthContext";
 import { Link } from "react-router";
 
 import {
@@ -21,6 +22,7 @@ import {
 export default function NavBar() {
   const { state, dispatch } = useMenu();
   const { totalProducts } = useCart();
+  const { user } = useAuth();
 
   const [showTheme, setShowTheme] = useState(false);
 
@@ -56,12 +58,14 @@ export default function NavBar() {
         id="navBarWrapper"
         className="
           flex
+          flex-row-reverse
           items-center
           justify-between
           gap-2
           px-3
           py-2
           sm:px-5
+          navbar-desktop-layout
         "
         style={{
           color: "var(--mui-palette-text-primary)",
@@ -73,57 +77,57 @@ export default function NavBar() {
           className="flex items-center gap-2 sm:gap-4"
         >
           {/* Login */}
-          <a
-  href="http://127.0.0.1:8000/admin/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="
-    group
-    flex
-    cursor-pointer
-    items-center
-    gap-2
-    rounded-full
-    border
-    border-transparent
-    p-2
-    transition-all
-    duration-300
-
-    hover:border-[#6F4E37]
-    hover:px-4
-
-    dark:hover:border-white
-  "
->
-  <UserRound
-    className="
-      h-5
-      w-5
-      text-[var(--mui-palette-primary-main)]
-    "
-  />
-
-  <span
-    className="
-      max-w-0
-      overflow-hidden
-      whitespace-nowrap
-      text-sm
-      font-bold
-      text-[var(--mui-palette-primary-main)]
-      opacity-0
-      transition-all
-      duration-300
-
-      group-hover:max-w-32
-      group-hover:opacity-100
-
-    "
-  >
-    پنل ادمین
-  </span>
-</a>
+          <Link
+            to="/account"
+            aria-label={user ? "حساب کاربری" : "ورود یا ثبت‌نام"}
+            className="
+              group
+              relative
+              flex
+              h-11
+              w-11
+              shrink-0
+              cursor-pointer
+              items-center
+              justify-center
+              rounded-full
+              border
+              border-transparent
+              transition-colors
+              duration-300
+              hover:border-[#6F4E37]
+              dark:hover:border-white
+            "
+          >
+            <UserRound className="h-5 w-5 text-[var(--mui-palette-primary-main)]" />
+            <span
+              className="
+                pointer-events-none
+                absolute
+                left-1/2
+                top-full
+                z-50
+                mt-2
+                -translate-x-1/2
+                whitespace-nowrap
+                rounded-lg
+                bg-[var(--mui-palette-background-paper)]
+                px-3
+                py-1.5
+                text-sm
+                font-bold
+                text-[var(--mui-palette-primary-main)]
+                opacity-0
+                shadow-lg
+                transition-opacity
+                duration-200
+                group-hover:opacity-100
+                group-focus-visible:opacity-100
+              "
+            >
+              {user ? "حساب کاربری" : "ورود یا ثبت‌نام"}
+            </span>
+          </Link>
 
           {/* Cart */}
           <Link
@@ -217,10 +221,12 @@ export default function NavBar() {
             <div
               className={`
                 absolute
-                right-0
+                left-1
+                right-auto
                 top-12
                 z-50
 
+                max-w-[calc(100vw-1.5rem)]
                 whitespace-nowrap
 
                 rounded-2xl
@@ -256,7 +262,7 @@ export default function NavBar() {
         </div>
 
         {/* Logo */}
-        <div className="order-2 md:order-3">
+        <div id="navBarLogo">
           <Link to="/">
             <img
               src={logoNavLight}
@@ -269,7 +275,7 @@ export default function NavBar() {
         {/* Menu */}
         <div
           id="NavBarMenu"
-          className="order-3 lg:order-2"
+          className="flex items-center"
         >
           <NavLinks />
 

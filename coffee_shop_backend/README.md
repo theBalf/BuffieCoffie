@@ -6,6 +6,9 @@ Django + Django REST Framework backend for an online cafe menu.
 
 - Django Admin for adding, editing, deleting products and categories
 - REST API for categories, products and orders
+- Customer registration, session login, and editable customer profiles
+- Staff-only product/category management and order status updates
+- Cafe table management with table-bound QR ordering and occupancy tracking
 - Filtering by category, price, available, featured, temperature, caffeine
 - Search products by name/description/category
 - Swagger API docs
@@ -32,6 +35,61 @@ python manage.py runserver
 - Swagger: http://127.0.0.1:8000/api/docs/
 - Categories: http://127.0.0.1:8000/api/menu/categories/
 - Products: http://127.0.0.1:8000/api/menu/products/
+- Account API: http://127.0.0.1:8000/api/accounts/
+
+The React account page supports public registration and login. Customers can
+save their name, email, phone number, and address and view their own orders.
+Orders submitted while signed in are associated with that account. Staff
+accounts are separated into two roles: operations admins can view prices and
+reports and update inventory, availability, featured status, preparation time,
+and order status; store managers can also manage prices, discounts, and other
+staff accounts. The primary owner is a separate superuser and cannot be
+managed by store managers. Regular accounts cannot access staff APIs or Django
+Admin.
+
+The orders API creates eight test cafe tables during migration. Customers can
+select an available table for dine-in orders, or scan its table-specific QR
+code to lock the order to that table. An active dine-in order occupies its
+table until it is delivered or cancelled. Staff can manage tables and their
+QR codes from the dashboard.
+
+Account API endpoints:
+
+```txt
+GET  /api/accounts/csrf/
+GET  /api/accounts/me/
+POST /api/accounts/register/
+POST /api/accounts/login/
+POST /api/accounts/logout/
+GET  /api/accounts/profile/
+PATCH /api/accounts/profile/
+GET  /api/orders/tables/
+GET  /api/orders/tables/qr/<table-token>/
+GET  /api/orders/tables/?manage=true  (staff)
+POST /api/orders/tables/              (staff)
+PATCH /api/orders/tables/<id>/        (staff; update occupied status)
+```
+
+Products have a persisted initial half-star rating, and customers can update
+their rating in the account page for products included in their orders. Each
+customer has one rating per product (0.5 to 5 in half-star increments); product
+ratings show the average of customer votes rounded up to the nearest half star.
+Cancelled orders cannot be used to rate a product.
+
+After applying migrations, create/update the access groups and the primary
+owner account from environment variables (PowerShell):
+
+```powershell
+$env:BUFFIE_OWNER_PASSWORD = "<choose-a-strong-password>"
+python manage.py create_primary_admin
+Remove-Item Env:BUFFIE_OWNER_PASSWORD
+```
+
+The command creates the `balf` primary owner and demotes any previous
+superusers to store managers, preserving their existing passwords. Use the
+manager account to create additional staff and assign either the store manager
+or operations admin group. Do not reuse the development password in a
+deployed environment.
 
 ## API Examples
 

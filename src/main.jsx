@@ -10,6 +10,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme/theme.js";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CartProvider } from "./Context/CartProvider";
+import { AuthProvider } from "./Context/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -20,9 +21,11 @@ createRoot(document.getElementById("root")).render(
         <CssBaseline />
         <QueryClientProvider client={queryClient}>
           <CartProvider>
-          <NavMenuProvider>
-            <App />
-          </NavMenuProvider>
+            <AuthProvider>
+              <NavMenuProvider>
+                <App />
+              </NavMenuProvider>
+            </AuthProvider>
           </CartProvider>
         </QueryClientProvider>
       </ThemeProvider>

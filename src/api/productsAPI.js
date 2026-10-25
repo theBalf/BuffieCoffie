@@ -1,4 +1,6 @@
-const PRODUCTS_URL = "http://127.0.0.1:8000/api/menu/products/";
+import { API_BASE_URL } from "./apiBase";
+
+const PRODUCTS_URL = `${API_BASE_URL}/api/menu/products/`;
 
 export async function getProducts(category, search,featured) {
   const params = new URLSearchParams();
@@ -43,4 +45,19 @@ export async function getPaginatedProducts(
   }
 
   return response.json();
+}
+
+export async function getAllProducts(category) {
+  const products = [];
+  let page = 1;
+  let hasNextPage = true;
+
+  while (hasNextPage) {
+    const data = await getPaginatedProducts(category, "", page);
+    products.push(...data.results);
+    hasNextPage = Boolean(data.next);
+    page += 1;
+  }
+
+  return products;
 }

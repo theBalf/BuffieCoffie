@@ -1,7 +1,6 @@
 import { useProducts } from "../Components/hooks/ReactQuery/useProducts";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 import ShelfCard from "../Components/ShelfCard";
+import ProductGridSkeleton from "../Components/ProductGridSkeleton";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -15,14 +14,6 @@ export default function FeaturesProductsSection() {
     undefined,
     true
   );
-
-  if (isPending) {
-    return (
-      <div className="px-4 py-8">
-        <Skeleton height={320} />
-      </div>
-    );
-  }
 
   if (isError) {
     return <p className="py-8 text-center">{error.message}</p>;
@@ -56,27 +47,30 @@ export default function FeaturesProductsSection() {
           </h2>
         </div>
         {/*  */}
-        <Swiper
-          modules={[Navigation]}
-          navigation
-          grabCursor
-          slidesPerView="auto"
-          spaceBetween={0}
-          className="
+        {isPending ? (
+          <ProductGridSkeleton carousel />
+        ) : (
+          <Swiper
+            modules={[Navigation]}
+            navigation
+            grabCursor
+            slidesPerView="auto"
+            spaceBetween={0}
+            className="
     featured-swiper
     !overflow-hidden
     !px-12
     !py-4
   "
-          style={{
-            "--swiper-navigation-color": "var(--mui-palette-primary-main)",
-            "--swiper-navigation-size": "22px",
-          }}
-        >
-          {data.map((product) => (
-            <SwiperSlide
-              key={product.id}
-              className="
+            style={{
+              "--swiper-navigation-color": "var(--mui-palette-primary-main)",
+              "--swiper-navigation-size": "22px",
+            }}
+          >
+            {data.map((product) => (
+              <SwiperSlide
+                key={product.id}
+                className="
         !w-[210px]
         px-1
         py-2
@@ -85,21 +79,24 @@ export default function FeaturesProductsSection() {
         md:!w-[245px]
         lg:!w-[255px]
       "
-            >
-              <ShelfCard
-                key={product.id}
-                product={product}
-                image={product.image_url}
-                title={product.name}
-                description={product.description}
-                price={product.price}
-                preparationTime={product.preparation_time}
-                isStock={product.stock > 0}
-                isAvailable={product.is_available}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+              >
+                <ShelfCard
+                  key={product.id}
+                  product={product}
+                  image={product.image_url}
+                  title={product.name}
+                  description={product.description}
+                  price={product.discounted_price ?? product.price}
+                  originalPrice={product.price}
+                  discountPercentage={product.discount_percentage ?? 0}
+                  preparationTime={product.preparation_time}
+                  isStock={product.stock > 0}
+                  isAvailable={product.is_available}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </div>
     </section>
   );

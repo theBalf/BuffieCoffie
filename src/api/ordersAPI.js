@@ -1,4 +1,7 @@
-const ORDERS_URL = "http://127.0.0.1:8000/api/orders/";
+import { getCsrfToken, prepareAccountSession } from "./accountAPI";
+import { API_BASE_URL } from "./apiBase";
+
+const ORDERS_URL = `${API_BASE_URL}/api/orders/`;
 
 function getErrorMessage(data) {
   if (typeof data === "string") {
@@ -14,12 +17,16 @@ function getErrorMessage(data) {
 }
 
 export async function createOrder(order) {
+  await prepareAccountSession();
+  const csrfToken = getCsrfToken();
   const response = await fetch(ORDERS_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
     },
     body: JSON.stringify(order),
+    credentials: "include",
   });
 
   const data = await response.json();

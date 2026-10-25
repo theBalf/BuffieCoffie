@@ -8,3 +8,8 @@
 html {
   font-family: "Vazirmatn Variable", sans-serif;
 }
+
+button:disabled,
+button[aria-disabled="true"] {
+  cursor: default;
+}

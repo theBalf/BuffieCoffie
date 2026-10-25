@@ -74,16 +74,16 @@ const productCardStyles = {
   title: `
     truncate
     text-center
-    text-[clamp(0.75rem,2.6vw,0.875rem)]
+    text-[clamp(1rem,3.2vw,1.125rem)]
     font-bold
-    leading-5
+    leading-6
 
     text-[var(--mui-palette-text-primary)]
   `,
 
   price: `
     text-center
-    text-[clamp(0.7rem,2.4vw,0.8rem)]
+    text-[clamp(1rem,3.2vw,1.125rem)]
     font-bold
 
     text-[var(--mui-palette-primary-main)]
@@ -103,9 +103,8 @@ const productCardStyles = {
 
   button: `
     flex
-    min-h-11
-    h-11
-    w-full
+    min-h-10
+    h-10
     items-center
     justify-center
 

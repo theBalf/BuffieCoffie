@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { useCart } from "@/Context/CartProvider";
 import { useNavigate } from "react-router";
+import StockLimitButton from "@/Components/StockLimitButton";
 
 export default function CartPage() {
   const {
@@ -200,10 +201,13 @@ export default function CartPage() {
                     border-[var(--mui-palette-divider)]
                   "
                 >
-                  <button
-                    type="button"
+                  <StockLimitButton
+                    itemName={item.name}
                     onClick={() => increaseProductInCart(item.id)}
-                    className="
+                    disabled={
+                      !item.is_available || item.quantity >= Number(item.stock)
+                    }
+                    className={`
                       flex
                       h-10
                       w-10
@@ -211,15 +215,12 @@ export default function CartPage() {
                       justify-center
                       text-lg
                       font-bold
+                      text-[var(--mui-palette-text-primary)]
                       transition
                       hover:bg-black/5
-                    "
-                    style={{
-                      color: "var(--mui-palette-text-primary)",
-                    }}
-                  >
-                    +
-                  </button>
+                      disabled:opacity-40
+                    `}
+                  />
 
                   <span
                     className="

@@ -1,7 +1,8 @@
 from django.contrib import admin
+from accounts.permissions import is_manager
 from unfold.admin import ModelAdmin
 
-from .models import Category, Product
+from .models import Category, DiscountGroup, Product
 
 
 @admin.register(Category)
@@ -26,6 +27,15 @@ class CategoryAdmin(ModelAdmin):
         "slug": ("name",),
     }
 
+    def has_add_permission(self, request):
+        return is_manager(request.user)
+
+    def has_change_permission(self, request, obj=None):
+        return is_manager(request.user)
+
+    def has_delete_permission(self, request, obj=None):
+        return is_manager(request.user)
+
 
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
@@ -37,10 +47,12 @@ class ProductAdmin(ModelAdmin):
         "is_available",
         "is_featured",
         "temperature",
+        "preparation_time",
     ]
 
     list_filter = [
         "category",
+        "discount_groups",
         "is_available",
         "is_featured",
         "temperature",
@@ -58,8 +70,47 @@ class ProductAdmin(ModelAdmin):
     }
 
     list_editable = [
-        "price",
         "stock",
         "is_available",
         "is_featured",
+        "preparation_time",
     ]
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if not is_manager(request.user):
+            readonly_fields.extend(["price", "discount_groups"])
+        return readonly_fields
+
+    def has_add_permission(self, request):
+        return is_manager(request.user)
+
+    def has_delete_permission(self, request, obj=None):
+        return is_manager(request.user)
+
+
+@admin.register(DiscountGroup)
+class DiscountGroupAdmin(ModelAdmin):
+    list_display = [
+        "name",
+        "discount_percentage",
+        "is_active",
+        "product_count",
+        "updated_at",
+    ]
+    list_filter = ["is_active"]
+    search_fields = ["name", "description", "products__name"]
+    filter_horizontal = ["products"]
+
+    @admin.display(description="تعداد محصولات")
+    def product_count(self, obj):
+        return obj.products.count()
+
+    def has_add_permission(self, request):
+        return is_manager(request.user)
+
+    def has_change_permission(self, request, obj=None):
+        return is_manager(request.user)
+
+    def has_delete_permission(self, request, obj=None):
+        return is_manager(request.user)

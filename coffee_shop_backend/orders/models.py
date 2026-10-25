@@ -1,8 +1,42 @@
 from django.db import models
+from django.conf import settings
+from django.core.validators import MinValueValidator
+from uuid import uuid4
 from menu.models import Product
 
 
+class CafeTable(models.Model):
+    table_number = models.PositiveIntegerField(
+        unique=True,
+        validators=[MinValueValidator(1)],
+        verbose_name="شماره میز",
+    )
+    is_occupied = models.BooleanField(default=False, verbose_name="اشغال‌شده")
+    qr_token = models.UUIDField(default=uuid4, unique=True, editable=False)
+
+    class Meta:
+        ordering = ["table_number"]
+        verbose_name = "میز کافه"
+        verbose_name_plural = "میزهای کافه"
+
+    def __str__(self):
+        return f"میز {self.table_number}"
+
+
 class Order(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        related_name='orders',
+        on_delete=models.SET_NULL,
+    )
+    guest_claim_token = models.UUIDField(
+        null=True,
+        blank=True,
+        unique=True,
+        editable=False,
+    )
     class Status(models.TextChoices):
         PENDING = 'pending', 'Pending'
         PREPARING = 'preparing', 'Preparing'
@@ -60,7 +94,7 @@ class OrderItem(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.unit_price and self.product_id:
-            self.unit_price = self.product.price
+            self.unit_price = self.product.discounted_price
         super().save(*args, **kwargs)
 
     def __str__(self):

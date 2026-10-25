@@ -1,5 +1,6 @@
-const CATEGORIES_URL =
-  "http://127.0.0.1:8000/api/menu/categories/";
+import { API_BASE_URL } from "./apiBase";
+
+const CATEGORIES_URL = `${API_BASE_URL}/api/menu/categories/`;
 
 export async function getCategories() {
   const response = await fetch(CATEGORIES_URL);

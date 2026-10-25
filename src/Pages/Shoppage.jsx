@@ -4,6 +4,7 @@ import { premadeStyles } from "../JSRefs/responsiveParameters";
 import { usePaginatedProducts } from "../Components/hooks/ReactQuery/usePaginatedProducts";
 import ProductPagination from "../Components/ProductPagination";
 import ShopSearch from "@/Components/ShopSearch";
+import ProductGridSkeleton from "../Components/ProductGridSkeleton";
 
 const cardStyle = premadeStyles.ProductCard;
 
@@ -56,10 +57,6 @@ export default function ShopPage() {
     });
   }
 
-  if (isPending) {
-    return <div className="py-20 text-center">در حال دریافت محصولات...</div>;
-  }
-
   if (isError) {
     return <div className="py-20 text-center">{error.message}</div>;
   }
@@ -73,57 +70,71 @@ export default function ShopPage() {
       }}
     >
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6">
-        {/* ----------سرچ */}
-        <ShopSearch initialValue={search} onSearch={handleSearch} />
-        {/* ----------سرچ */}
-
-        <div className="mb-8">
-          <h1
-            className="text-center text-2xl font-bold md:text-3xl"
-            style={{
-              color: "var(--mui-palette-text-primary)",
-              fontFamily: '"Vazirmatn Variable", sans-serif',
-            }}
-          >
-            {category ? category : "همه محصولات"}
-          </h1>
-        </div>
-
-        {/* Products */}
-        {products.length === 0 ? (
-          <p
-            className="text-center"
-            style={{
-              color: "var(--mui-palette-text-secondary)",
-            }}
-          >
-            محصولی پیدا نشد.
-          </p>
+        {isPending ? (
+          <>
+            <div className="product-skeleton-shape product-skeleton-search" />
+            <div className="product-skeleton-heading">
+              <div className="product-skeleton-shape product-skeleton-heading-line" />
+            </div>
+            <ProductGridSkeleton />
+          </>
         ) : (
-          <div className={cardStyle.grid}>
-            {products.map((product) => (
-              <ShelfCard
-              key={product.id}
-              product={product}
-              image={product.image_url}
-              title={product.name}
-              description={product.description}
-              price={product.price}
-              preparationTime={product.preparation_time}
-              isStock={product.stock > 0}
-              isAvailable={product.is_available}
-            />
-            ))}
-          </div>
-        )}
+          <>
+            {/* ----------سرچ */}
+            <ShopSearch initialValue={search} onSearch={handleSearch} />
+            {/* ----------سرچ */}
 
-        {/* Pagination */}
-        {data && data.count > 0 && (
-          <ProductPagination
-            count={data.count}
-            page={page}
-            onPageChange={handlePageChange}
-          />
+            <div className="mb-8">
+              <h1
+                className="text-center text-2xl font-bold md:text-3xl"
+                style={{
+                  color: "var(--mui-palette-text-primary)",
+                  fontFamily: '"Vazirmatn Variable", sans-serif',
+                }}
+              >
+                {category ? category : "همه محصولات"}
+              </h1>
+            </div>
+
+            {/* Products */}
+            {products.length === 0 ? (
+              <p
+                className="text-center"
+                style={{
+                  color: "var(--mui-palette-text-secondary)",
+                }}
+              >
+                محصولی پیدا نشد.
+              </p>
+            ) : (
+              <div className={cardStyle.grid}>
+                {products.map((product) => (
+                  <ShelfCard
+                    key={product.id}
+                    product={product}
+                    image={product.image_url}
+                    title={product.name}
+                    description={product.description}
+                    price={product.discounted_price ?? product.price}
+                    originalPrice={product.price}
+                    discountPercentage={product.discount_percentage ?? 0}
+                    preparationTime={product.preparation_time}
+                    isStock={product.stock > 0}
+                    isAvailable={product.is_available}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {data && data.count > 0 && (
+              <ProductPagination
+                count={data.count}
+                page={page}
+                onPageChange={handlePageChange}
+              />
+            )}
+          </>
         )}
       </div>
     </main>
