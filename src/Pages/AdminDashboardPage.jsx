@@ -54,6 +54,18 @@ function printOrderReceipt(order) {
   }
 
   const orderTime = new Date(order.created_at).toLocaleString("fa-IR");
+  const orderTypeLabel =
+    order.order_type === "dine_in"
+      ? "داخل سالن"
+      : order.order_type === "delivery"
+        ? "ارسال با پیک"
+        : "بیرون‌بر";
+  const orderDetails =
+    order.order_type === "dine_in" && order.table_number
+      ? `<div>شماره میز: ${escapeHtml(new Intl.NumberFormat("fa-IR").format(order.table_number))}</div>`
+      : order.order_type === "delivery" && order.address
+        ? `<div class="address">آدرس: ${escapeHtml(order.address)}</div>`
+        : "";
   const items = (order.items ?? [])
     .map(
       (item) => `
@@ -77,6 +89,7 @@ function printOrderReceipt(order) {
           h1, p { text-align: center; }
           h1 { font-size: 16px; }
           .meta { line-height: 1.9; border-bottom: 1px dashed #333; padding-bottom: 8px; }
+          .address { white-space: pre-wrap; overflow-wrap: anywhere; }
           table { width: 100%; border-collapse: collapse; margin-top: 10px; }
           th, td { padding: 6px 2px; text-align: right; border-bottom: 1px dashed #aaa; }
           .total { margin-top: 12px; font-weight: bold; }
@@ -89,7 +102,8 @@ function printOrderReceipt(order) {
           <div>زمان ثبت: ${escapeHtml(orderTime)}</div>
           <div>مشتری: ${escapeHtml(order.customer_name)}</div>
           <div>تماس: ${escapeHtml(order.phone)}</div>
-          <div>نوع سفارش: ${escapeHtml(order.order_type === "dine_in" ? `حضوری - میز ${order.table_number ?? "—"}` : order.order_type === "delivery" ? "ارسال" : "بیرون‌بر")}</div>
+          <div>نوع سفارش: ${orderTypeLabel}</div>
+          ${orderDetails}
           ${order.note ? `<div>توضیحات: ${escapeHtml(order.note)}</div>` : ""}
         </div>
         <table>

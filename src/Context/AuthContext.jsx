@@ -42,8 +42,8 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const login = useCallback(async (identifier, password) => {
-    const currentUser = await loginAccount(identifier, password);
+  const login = useCallback(async (identifier, password, captchaToken) => {
+    const currentUser = await loginAccount(identifier, password, captchaToken);
     setUser(currentUser);
     setSession({ isLoading: false, loadError: "" });
     return currentUser;

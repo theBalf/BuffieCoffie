@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient, APITestCase
 
 from accounts.models import CustomerProfile
 from menu.models import Category, DiscountGroup, Product
@@ -158,6 +158,25 @@ class OrderStockTests(APITestCase):
         order = Order.objects.get(pk=response.data["id"])
         self.assertEqual(order.user, customer)
         self.assertIsNone(order.guest_claim_token)
+
+    def test_authenticated_order_creation_requires_csrf_token(self):
+        customer = get_user_model().objects.create_user(
+            username="csrf-order-customer",
+            password="Coffee-Password-2026!",
+        )
+        client = APIClient(enforce_csrf_checks=True)
+        client.force_login(customer)
+
+        response = client.post(
+            self.order_url,
+            self.order_data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock, 5)
+        self.assertEqual(Order.objects.count(), 0)
 
     def test_authenticated_order_is_attached_to_customer_account(self):
         customer = get_user_model().objects.create_user(

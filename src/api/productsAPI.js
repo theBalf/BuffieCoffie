@@ -27,7 +27,8 @@ export async function getProducts(category, search,featured) {
 export async function getPaginatedProducts(
   category,
   search,
-  page = 1
+  page = 1,
+  { signal } = {}
 ) {
   const params = new URLSearchParams();
 
@@ -37,7 +38,8 @@ export async function getPaginatedProducts(
   params.append("page", page);
 
   const response = await fetch(
-    `${PRODUCTS_URL}?${params.toString()}`
+    `${PRODUCTS_URL}?${params.toString()}`,
+    { signal }
   );
 
   if (!response.ok) {

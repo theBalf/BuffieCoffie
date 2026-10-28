@@ -85,11 +85,15 @@ export async function getCurrentUser() {
   return result.user;
 }
 
-export async function loginAccount(identifier, password) {
+export async function loginAccount(identifier, password, captchaToken) {
   await prepareAccountSession();
   const result = await request(`${API_URL}/login/`, {
     method: "POST",
-    body: JSON.stringify({ identifier, password }),
+    body: JSON.stringify({
+      identifier,
+      password,
+      captcha_token: captchaToken,
+    }),
   });
   return result.user;
 }

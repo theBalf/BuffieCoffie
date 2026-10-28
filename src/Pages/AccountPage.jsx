@@ -5,6 +5,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../Context/AuthContext";
 import { getMyOrders, rateProduct } from "../api/accountAPI";
 import StarRate from "../Components/RatingStar";
+import TurnstileWidget from "../Components/TurnstileWidget";
+
+const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
 const inputClass =
   "min-h-11 w-full rounded-xl border border-[var(--mui-palette-divider)] bg-transparent px-4 py-3 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mui-palette-primary-main)]";
@@ -26,6 +29,8 @@ export default function AccountPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaWidgetKey, setCaptchaWidgetKey] = useState(0);
   const [ratingProductSlug, setRatingProductSlug] = useState("");
   const queryClient = useQueryClient();
   const ordersQuery = useQuery({
@@ -58,12 +63,20 @@ export default function AccountPage() {
           password: data.get("password"),
         });
       } else {
-        await login(data.get("identifier").trim(), data.get("password"));
+        await login(
+          data.get("identifier").trim(),
+          data.get("password"),
+          captchaToken
+        );
       }
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
       setIsSubmitting(false);
+      if (!isRegister) {
+        setCaptchaToken("");
+        setCaptchaWidgetKey((key) => key + 1);
+      }
     }
   }
 
@@ -188,10 +201,27 @@ export default function AccountPage() {
                   required
                 />
               </FormField>
+              {!isRegister && turnstileSiteKey && (
+              <TurnstileWidget
+                key={captchaWidgetKey}
+                siteKey={turnstileSiteKey}
+                onToken={setCaptchaToken}
+              />
+              )}
+              {!isRegister && import.meta.env.PROD && !turnstileSiteKey && (
+              <p className="text-sm text-red-600" role="alert">
+                کلید عمومی Cloudflare Turnstile برای ورود تنظیم نشده است.
+              </p>
+              )}
               <button
                 className="min-h-11 w-full rounded-xl bg-[var(--mui-palette-primary-main)] px-4 py-3 font-bold text-white disabled:opacity-60 dark:text-[#241812]"
                 type="submit"
-                disabled={isSubmitting}
+                disabled={
+                  isSubmitting ||
+                  (!isRegister &&
+                    import.meta.env.PROD &&
+                    (!turnstileSiteKey || !captchaToken))
+                }
               >
                 {isSubmitting
                   ? "لطفاً صبر کنید…"
@@ -206,6 +236,7 @@ export default function AccountPage() {
               onClick={() => {
                 setIsRegister((current) => !current);
                 setErrorMessage("");
+                setCaptchaToken("");
               }}
             >
               {isRegister

@@ -16,6 +16,13 @@ Django + Django REST Framework backend for an online cafe menu.
 
 ## Setup
 
+For local development, set `DJANGO_DEBUG=True` before starting Django. On
+Windows PowerShell:
+
+```powershell
+$env:DJANGO_DEBUG = "True"
+```
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # mac/linux
@@ -28,6 +35,68 @@ python manage.py createsuperuser
 python manage.py seed_menu
 python manage.py runserver
 ```
+
+## Production configuration
+
+The backend defaults to `DJANGO_DEBUG=False` and refuses to start without
+`DJANGO_SECRET_KEY`, `DATABASE_URL`, and (by default) the Turnstile secret.
+Configure these environment variables in the deployment provider (never commit
+production secrets). Generate the Django key with:
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+- `DJANGO_SECRET_KEY`: a unique, long, randomly generated secret.
+- `DJANGO_ALLOWED_HOSTS`: comma-separated backend hostnames, without schemes.
+- `FRONTEND_URL`: public frontend origin, including `https://`.
+- `CORS_ALLOWED_ORIGINS` and `CSRF_TRUSTED_ORIGINS`: comma-separated frontend
+  origins, including `https://`.
+- `DJANGO_DEBUG`: keep unset or set to `False` in production.
+- `DATABASE_URL`: PostgreSQL connection URL. SQLite remains the local default.
+- `DATABASE_SSLMODE`: must be `verify-full` in production to encrypt the
+  connection and verify the database server hostname. The mode may also be
+  included as `sslmode=verify-full` in `DATABASE_URL`.
+- `DATABASE_SSLROOTCERT`: optional path to the provider's CA bundle when its
+  certificate is not trusted by the system. Keep the CA file available to the
+  backend process.
+- `TURNSTILE_SECRET_KEY`: Cloudflare Turnstile secret; keep it only on the
+  backend. Turnstile is required by default when debug mode is disabled.
+- `TURNSTILE_ALLOWED_HOSTNAMES`: optional comma-separated frontend hostnames
+  that are accepted in Cloudflare's verification response.
+- `MEDIA_ROOT`: persistent media directory if the platform provides a mounted
+  volume. Otherwise use durable object storage for uploaded media.
+
+Set `VITE_API_BASE_URL` for the frontend to the backend's HTTPS origin if the
+API is hosted separately. If the frontend and API share an origin, the frontend
+uses that origin automatically in production. Set the frontend's
+`VITE_TURNSTILE_SITE_KEY` to the public Cloudflare site key. Never expose the
+Turnstile secret in a `VITE_` variable or frontend code. Session and CSRF
+cookies are marked secure whenever debug mode is disabled. Prefer hosting the
+frontend and API on the same site (for example, `example.com` and
+`api.example.com`); for different registrable domains, set
+`CROSS_SITE_SESSION_COOKIES=True` and verify that the browser/provider supports
+third-party cookies.
+
+### Generic Linux deployment
+
+From `coffee_shop_backend`, configure the environment variables above in the
+hosting provider, then run:
+
+```bash
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py check --deploy
+gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+```
+
+Run migrations as a one-off/release command when deploying new versions, not
+once per web worker. Provision a durable PostgreSQL database and media storage,
+configure HTTPS and backups at the hosting provider, and create the owner
+account using the management command below. The backend expects its trusted
+HTTPS reverse proxy to set `X-Forwarded-Proto: https`; do not expose an
+untrusted direct path to the application server.
 
 ## Important URLs
 

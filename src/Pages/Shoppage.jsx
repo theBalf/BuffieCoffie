@@ -70,9 +70,14 @@ export default function ShopPage() {
       }}
     >
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6">
+        <ShopSearch
+          key={search}
+          initialValue={search}
+          onSearch={handleSearch}
+        />
+
         {isPending ? (
           <>
-            <div className="product-skeleton-shape product-skeleton-search" />
             <div className="product-skeleton-heading">
               <div className="product-skeleton-shape product-skeleton-heading-line" />
             </div>
@@ -80,10 +85,6 @@ export default function ShopPage() {
           </>
         ) : (
           <>
-            {/* ----------سرچ */}
-            <ShopSearch initialValue={search} onSearch={handleSearch} />
-            {/* ----------سرچ */}
-
             <div className="mb-8">
               <h1
                 className="text-center text-2xl font-bold md:text-3xl"

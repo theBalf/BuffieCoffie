@@ -1,10 +1,28 @@
+import os
 from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlparse
+
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'dev-only-change-me'
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+
+def environment_list(name, default):
+    return [
+        value.strip()
+        for value in os.environ.get(name, ",".join(default)).split(",")
+        if value.strip()
+    ]
+
+
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes"}
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is false.")
+    SECRET_KEY = "dev-only-change-me"
+
+ALLOWED_HOSTS = environment_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 
 INSTALLED_APPS = [
     "unfold",
@@ -56,12 +74,61 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+
+def build_database_config(database_url, debug, sslmode=None, sslrootcert=None):
+    parsed_database_url = urlparse(database_url)
+    if parsed_database_url.scheme not in {"postgres", "postgresql"}:
+        raise ImproperlyConfigured(
+            "DATABASE_URL must use the postgres or postgresql scheme."
+        )
+    if not debug and sslmode != "verify-full":
+        raise ImproperlyConfigured(
+            "DATABASE_SSLMODE must be verify-full when DJANGO_DEBUG is false."
+        )
+
+    options = {}
+    if sslmode:
+        options["sslmode"] = sslmode
+    if sslrootcert:
+        options["sslrootcert"] = sslrootcert
+
+    return {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": unquote(parsed_database_url.path.lstrip("/")),
+        "USER": unquote(parsed_database_url.username or ""),
+        "PASSWORD": unquote(parsed_database_url.password or ""),
+        "HOST": parsed_database_url.hostname or "",
+        "PORT": parsed_database_url.port or "",
+        "CONN_MAX_AGE": 60,
+        "OPTIONS": options,
     }
-}
+
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
+    parsed_database_url = urlparse(DATABASE_URL)
+    database_sslmode = os.environ.get("DATABASE_SSLMODE") or parse_qs(
+        parsed_database_url.query
+    ).get("sslmode", [None])[0]
+    DATABASES = {
+        "default": build_database_config(
+            DATABASE_URL,
+            DEBUG,
+            database_sslmode,
+            os.environ.get("DATABASE_SSLROOTCERT"),
+        )
+    }
+else:
+    if not DEBUG:
+        raise ImproperlyConfigured(
+            "DATABASE_URL must be set when DJANGO_DEBUG is false."
+        )
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 LANGUAGE_CODE = "fa"
 TIME_ZONE = 'Asia/Baku'
@@ -69,20 +136,53 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = Path(os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles"))
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "")
+TURNSTILE_REQUIRED = os.environ.get(
+    "TURNSTILE_REQUIRED",
+    "False" if DEBUG else "True",
+).lower() in {"1", "true", "yes"}
+if TURNSTILE_REQUIRED and not TURNSTILE_SECRET_KEY:
+    raise ImproperlyConfigured(
+        "TURNSTILE_SECRET_KEY must be set when TURNSTILE_REQUIRED is enabled."
+    )
+TURNSTILE_ALLOWED_HOSTNAMES = environment_list("TURNSTILE_ALLOWED_HOSTNAMES", [])
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5173",
-    "http://localhost:5173",
-]
+CORS_ALLOWED_ORIGINS = environment_list(
+    "CORS_ALLOWED_ORIGINS",
+    ["http://127.0.0.1:5173", "http://localhost:5173"],
+)
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:5173",
-    "http://localhost:5173",
-]
+CSRF_TRUSTED_ORIGINS = environment_list(
+    "CSRF_TRUSTED_ORIGINS",
+    ["http://127.0.0.1:5173", "http://localhost:5173"],
+)
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 0 if DEBUG else 31_536_000
+SECURE_PROXY_SSL_HEADER = (
+    ("HTTP_X_FORWARDED_PROTO", "https") if not DEBUG else None
+)
+if os.environ.get("CROSS_SITE_SESSION_COOKIES", "False").lower() in {"1", "true", "yes"}:
+    if DEBUG:
+        raise ImproperlyConfigured("Cross-site session cookies require HTTPS and DEBUG=False.")
+    SESSION_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SAMESITE = "None"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -101,11 +201,16 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
-LOGOUT_REDIRECT_URL = "http://localhost:5173/shop"
+if not DEBUG:
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
+        "whitenoise.middleware.WhiteNoiseMiddleware",
+    )
+LOGOUT_REDIRECT_URL = f"{FRONTEND_URL}/shop"
 UNFOLD = {
     "SITE_TITLE": "BuffieCoffee Admin",
     "SITE_HEADER": "BuffieCoffee",
-"SITE_URL": "http://localhost:5173/",
+    "SITE_URL": f"{FRONTEND_URL}/",
     
     "COLORS": {
         "base": {

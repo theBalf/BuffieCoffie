@@ -1,4 +1,7 @@
+import logging
+
 from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.middleware.csrf import get_token
 from django.utils.decorators import method_decorator
@@ -8,6 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .turnstile import TurnstileUnavailable, verify_turnstile
 from .models import CustomerProfile
 from .serializers import (
     CustomerProfileSerializer,
@@ -16,6 +20,7 @@ from .serializers import (
 )
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 def user_response(user):
@@ -62,14 +67,40 @@ class LoginView(APIView):
 
     @method_decorator(csrf_protect)
     def post(self, request):
-        identifier = request.data.get("identifier", "").strip()
+        captcha_token = request.data.get("captcha_token", "")
+        try:
+            challenge_valid = verify_turnstile(captcha_token)
+        except ImproperlyConfigured:
+            logger.exception("Turnstile is required but is not configured.")
+            return Response(
+                {"detail": "سرویس امنیتی ورود در سرور پیکربندی نشده است."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        except TurnstileUnavailable:
+            return Response(
+                {"detail": "بررسی امنیتی موقتاً در دسترس نیست. دوباره تلاش کنید."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        if not challenge_valid:
+            return Response(
+                {"detail": "تأیید امنیتی کامل نشد. دوباره تلاش کنید."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        identifier = request.data.get("identifier", "")
         password = request.data.get("password", "")
-        if not identifier or not password:
+        if (
+            not isinstance(identifier, str)
+            or not isinstance(password, str)
+            or not identifier.strip()
+            or not password
+        ):
             return Response(
                 {"detail": "نام کاربری/شماره تماس و رمز عبور الزامی است."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        identifier = identifier.strip()
         normalized_phone = normalize_phone(identifier)
         user_match = User.objects.filter(
             Q(username__iexact=identifier)

@@ -5,6 +5,7 @@ export function usePaginatedProducts(category, search, page = 1) {
   return useQuery({
     queryKey: ["paginated-products", category, search, page],
 
-    queryFn: () => getPaginatedProducts(category, search, page),
+    queryFn: ({ signal }) =>
+      getPaginatedProducts(category, search, page, { signal }),
   });
 }
