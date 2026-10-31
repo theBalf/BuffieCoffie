@@ -81,7 +81,10 @@ def build_database_config(database_url, debug, sslmode=None, sslrootcert=None):
         raise ImproperlyConfigured(
             "DATABASE_URL must use the postgres or postgresql scheme."
         )
-    if not debug and sslmode != "verify-full":
+    database_host = os.environ.get("DATABASE_HOST") or (parsed_database_url.hostname or "")
+    is_local_socket = database_host == "/var/run/postgresql"
+
+    if not debug and not is_local_socket and sslmode != "verify-full":
         raise ImproperlyConfigured(
             "DATABASE_SSLMODE must be verify-full when DJANGO_DEBUG is false."
         )
@@ -97,7 +100,7 @@ def build_database_config(database_url, debug, sslmode=None, sslrootcert=None):
         "NAME": unquote(parsed_database_url.path.lstrip("/")),
         "USER": unquote(parsed_database_url.username or ""),
         "PASSWORD": unquote(parsed_database_url.password or ""),
-        "HOST": parsed_database_url.hostname or "",
+        "HOST": database_host,
         "PORT": parsed_database_url.port or "",
         "CONN_MAX_AGE": 60,
         "OPTIONS": options,
